@@ -1,5 +1,6 @@
-import { Archive, Boxes, Layers3, LogOut, TriangleAlert } from "lucide-react";
+import { Archive, Boxes, LogOut, TriangleAlert } from "lucide-react";
 import { SpoolGraphic } from "./SpoolGraphic";
+import { Brand } from "./Brand";
 
 export type InventoryView = "inventory" | "low" | "archived";
 export function Sidebar({
@@ -17,12 +18,7 @@ export function Sidebar({
 }) {
   return (
     <aside className="sidebar">
-      <a className="brand" href="/" aria-label="FilaFlow, inicio">
-        <span className="brand-mark">
-          <Layers3 size={23} />
-        </span>
-        Fila<span>Flow</span>
-      </a>
+      <Brand />
       <span className="workspace-label">Tu espacio de impresión</span>
       <nav aria-label="Inventario">
         <button

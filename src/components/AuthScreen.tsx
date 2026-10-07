@@ -5,11 +5,12 @@ import {
   signInWithEmailAndPassword,
   signInAnonymously,
 } from "firebase/auth";
-import { ArrowRight, CircleCheck, Layers3, LockKeyhole } from "lucide-react";
+import { ArrowRight, CircleCheck, LockKeyhole } from "lucide-react";
 import { auth, db, usingEmulators } from "../lib/firebase";
 import { inventoryRepository } from "../lib/repository";
 import { friendlyError } from "../lib/errors";
 import { SpoolGraphic } from "./SpoolGraphic";
+import { Brand } from "./Brand";
 
 export function AuthScreen() {
   const [mode, setMode] = useState<"login" | "signup" | "reset">("login");
@@ -104,12 +105,7 @@ export function AuthScreen() {
   return (
     <main className="auth-shell">
       <section className="auth-story">
-        <a className="brand" href="/" aria-label="FilaFlow, inicio">
-          <span className="brand-mark">
-            <Layers3 size={24} />
-          </span>
-          Fila<span>Flow</span>
-        </a>
+        <Brand />
         <div className="auth-intro">
           <span className="eyebrow">Tu mesa de impresión, en orden</span>
           <h1>

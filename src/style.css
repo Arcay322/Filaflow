@@ -78,25 +78,25 @@ textarea:focus-visible {
   }
 }
 .brand {
-  font-family: Sora, sans-serif;
-  font-weight: 600;
-  font-size: 23px;
-  display: flex;
-  align-items: center;
-  letter-spacing: -1px;
+  display: block;
+  position: relative;
+  width: 184px;
+  max-width: 100%;
+  aspect-ratio: 1774 / 386;
+  overflow: hidden;
+  flex-shrink: 0;
 }
-.brand > span:last-child {
-  color: var(--blue);
+.brand img {
+  /* Frame the approved artwork without its transparent outer margins. */
+  position: absolute;
+  width: 122.44%;
+  max-width: none;
+  height: auto;
+  left: -11.05%;
+  top: -41.45%;
 }
-.brand-mark {
-  display: grid;
-  place-items: center;
-  width: 37px;
-  height: 37px;
-  background: var(--blue);
-  color: white;
-  border-radius: 10px;
-  margin-right: 10px;
+.auth-story .brand {
+  width: 230px;
 }
 .eyebrow {
   display: block;
@@ -1200,11 +1200,7 @@ input[type="color"] {
     gap: 15px;
   }
   .sidebar .brand {
-    font-size: 20px;
-  }
-  .brand-mark {
-    width: 32px;
-    height: 32px;
+    width: 165px;
   }
   .workspace-label,
   .sidebar-note {
