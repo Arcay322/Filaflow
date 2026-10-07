@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function owner(uid) { return request.auth != null && request.auth.uid == uid; }
+    function shortText(value, max) { return value is string && value.size() <= max; }
+    function weight(value) { return value is number && value >= 0 && value <= 10000; }
+    function validSpool(d) {
+      let fields = ['name', 'brand', 'material', 'colorName', 'colorHex', 'initialWeight', 'remainingWeight', 'tareWeight', 'purchasePrice', 'lowStockThreshold', 'location', 'notes', 'archived', 'createdAt', 'updatedAt', 'lastMovementId'];
+      return d.keys().hasAll(fields) && d.keys().hasOnly(fields)
+        && shortText(d.name, 80) && d.name.matches('.*\\S.*')
+        && shortText(d.brand, 60)
+        && d.material in ['PLA', 'PLA+', 'PLA Silk', 'PETG', 'TPU', 'ABS', 'ASA', 'Otro']
+        && shortText(d.colorName, 40) && d.colorName.matches('.*\\S.*')
+        && d.colorHex is string && d.colorHex.matches('^#[0-9a-fA-F]{6}$')
+        && weight(d.initialWeight) && d.initialWeight >= 1
+        && weight(d.remainingWeight) && d.remainingWeight <= d.initialWeight
+        && weight(d.tareWeight)
+        && d.purchasePrice is number && d.purchasePrice >= 0 && d.purchasePrice <= 100000
+        && weight(d.lowStockThreshold) && d.lowStockThreshold <= d.initialWeight
+        && shortText(d.location, 80) && shortText(d.notes, 500)
+        && d.archived is bool && d.createdAt is timestamp && d.updatedAt == request.time
+        && (d.lastMovementId == null || (shortText(d.lastMovementId, 128) && d.lastMovementId.size() > 0));
+    }
+    function validMovement(m) {
+      let fields = ['type', 'before', 'after', 'delta', 'cost', 'note', 'createdAt'];
+      return m.keys().hasAll(fields) && m.keys().hasOnly(fields)
+        && m.type in ['consume', 'adjust'] && weight(m.before) && weight(m.after)
+        && m.delta is number && m.delta == m.after - m.before && m.delta != 0
+        && m.cost is number && m.cost >= 0 && m.cost <= 100000
+        && shortText(m.note, 200) && m.createdAt == request.time
+        && ((m.type == 'consume' && m.after < m.before) || (m.type == 'adjust' && m.cost == 0));
+    }
+    match /users/{uid}/spools/{spoolId} {
+      function movementMatches() {
+        let nextId = request.resource.data.lastMovementId;
+        let p = /databases/$(database)/documents/users/$(uid)/spools/$(spoolId)/movements/$(nextId);
+        let m = getAfter(p).data;
+        return !resource.data.archived && nextId != null && nextId != resource.data.lastMovementId && !exists(p)
+          && validMovement(m) && m.before == resource.data.remainingWeight
+          && m.after == request.resource.data.remainingWeight
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['remainingWeight', 'lastMovementId', 'updatedAt']);
+      }
+      allow read: if owner(uid);
+      allow create: if owner(uid) && validSpool(request.resource.data)
+        && request.resource.data.createdAt == request.time && request.resource.data.lastMovementId == null;
+      allow update: if owner(uid) && validSpool(request.resource.data)
+        && request.resource.data.createdAt == resource.data.createdAt
+        && ((request.resource.data.remainingWeight == resource.data.remainingWeight
+          && request.resource.data.lastMovementId == resource.data.lastMovementId) || movementMatches());
+      allow delete: if false;
+
+      match /movements/{movementId} {
+        function balanced() {
+          let p = /databases/$(database)/documents/users/$(uid)/spools/$(spoolId);
+          let before = get(p).data;
+          let after = getAfter(p).data;
+          let m = request.resource.data;
+          return !before.archived && after.lastMovementId == movementId && before.lastMovementId != movementId
+            && m.before == before.remainingWeight && m.after == after.remainingWeight
+            && m.after <= before.initialWeight
+            && (m.type != 'consume' || math.abs(m.cost - (1.0 * (m.before - m.after) * before.purchasePrice / before.initialWeight)) <= 0.00501);
+        }
+        allow read: if owner(uid);
+        allow create: if owner(uid) && validMovement(request.resource.data) && balanced();
+        allow update, delete: if false;
+      }
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}
