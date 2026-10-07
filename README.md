@@ -61,7 +61,7 @@ La base debe existir en la región elegida **antes** de desplegar. La CLI puede 
 
 Ruta de bobinas: `users/{uid}/spools/{spoolId}`; movimientos: `movements/{movementId}` bajo cada bobina. Las reglas solo permiten acceso al propietario y validan todos los campos. El saldo y su movimiento se guardan juntos mediante una transacción. El historial no se puede modificar ni eliminar desde el cliente, y las bobinas se archivan en lugar de borrarse.
 
-La sesión dura la sesión del navegador. Las transacciones necesitan conexión; no hay cola de consumos offline. Las cantidades admiten tres decimales; las tarjetas muestran un decimal. Cambiar el precio de una bobina modifica el costo estimado de consumos futuros, mientras que el costo guardado de movimientos anteriores se conserva. El CSV exporta el inventario, incluidas las bobinas archivadas, pero no el historial.
+La sesión se conserva entre aperturas del navegador o la aplicación hasta que cierres sesión (si el navegador permite almacenamiento persistente). En equipos compartidos, cierra sesión al terminar. Crear, editar, archivar y registrar consumos requiere conexión; todas las escrituras usan transacciones y no hay cola offline. Las cantidades admiten tres decimales; las tarjetas muestran un decimal. Cambiar el precio de una bobina modifica el costo estimado de consumos futuros, mientras que el costo guardado de movimientos anteriores se conserva. El CSV exporta el inventario, incluidas las bobinas archivadas, pero no el historial.
 
 ## Alcance y costos
 
@@ -70,3 +70,14 @@ El proyecto mantiene el plan Spark. Las cuotas gratuitas se comparten entre todo
 `npm audit --omit=dev` no reportó vulnerabilidades al validar esta versión. La CLI de Firebase tiene avisos transitivos de desarrollo en `braces`, `uuid` y OpenTelemetry; no forman parte de los archivos publicados. Se usan únicamente configuraciones y patrones locales de confianza. Evita ejecutar emuladores en una interfaz pública y revisa actualizaciones de la CLI antes de ampliar su uso.
 
 Documentación: [Firebase Auth](https://firebase.google.com/docs/auth/web/password-auth), [transacciones](https://firebase.google.com/docs/firestore/manage-data/transactions), [reglas](https://firebase.google.com/docs/firestore/security/rules-conditions), [cuotas](https://firebase.google.com/docs/firestore/pricing).
+
+
+## PWA
+
+FilaFlow se puede instalar y abrir en una ventana independiente. Usa «Instalar app»; si el navegador no ofrece el diálogo nativo, el botón muestra los pasos para Chrome/Edge y Safari en iPhone/iPad. El manifest mantiene un identificador estable, ámbito `/`, idioma español y el símbolo aprobado de 1254 × 1254 px (el navegador adapta el icono al dispositivo). No requiere tiendas de aplicaciones.
+
+El service worker de Workbox almacena únicamente HTML, JavaScript, CSS, tipografías y recursos de marca. No guarda respuestas de Firebase ni habilita persistencia offline del inventario. Tras una primera visita con conexión, puede abrir la interfaz sin conexión y mostrar la pantalla de reconexión. El formulario permanece montado al perder conexión; se conserva mientras la aplicación siga abierta, sin prometer recuperar borradores después de cerrarla o recargarla.
+
+Las actualizaciones esperan en segundo plano. El aviso permite posponerlas y pide confirmación antes de reiniciar. Comprueba nuevas versiones al recuperar el foco; `sw.js` y el manifest usan los encabezados `no-cache` de Hosting. La PWA se genera únicamente en builds de producción; para probarla localmente usa `npm run build` y `npm run preview`.
+
+Las pruebas de PWA cubren instalación nativa y ayuda alternativa, conservación del formulario al reconectar, rechazo de escrituras offline y actualizaciones sin recarga automática. Documentación: [Vite PWA](https://vite-pwa-org.netlify.app/frameworks/react.html), [manifest e instalación](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable), [persistencia de Firebase Auth](https://firebase.google.com/docs/auth/web/auth-state-persistence).

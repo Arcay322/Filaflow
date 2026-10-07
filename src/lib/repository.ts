@@ -1,5 +1,4 @@
 import {
-  addDoc,
   collection,
   doc,
   getDocFromServer,
@@ -42,6 +41,11 @@ export function readSpool(id: string, data: DocumentData): Spool {
   };
 }
 
+function requireConnection() {
+  if (typeof navigator !== "undefined" && navigator.onLine === false)
+    throw new Error("Necesitas conexión a internet para guardar los cambios.");
+}
+
 export function inventoryRepository(db: Firestore, uid: string) {
   const root = collection(db, "users", uid, "spools");
   return {
@@ -59,14 +63,23 @@ export function inventoryRepository(db: Firestore, uid: string) {
       );
     },
     async create(input: SpoolInput) {
-      return addDoc(root, {
-        ...spoolSchema.parse(input),
-        lastMovementId: null,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+      requireConnection();
+      const ref = doc(root);
+      const data = spoolSchema.parse(input);
+      // A transaction cannot enqueue an offline write, including if connectivity
+      // drops after the initial check. Keep the form open until the server confirms.
+      await runTransaction(db, async (tx) => {
+        tx.set(ref, {
+          ...data,
+          lastMovementId: null,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
       });
+      return ref;
     },
     async edit(id: string, input: SpoolInput) {
+      requireConnection();
       await runTransaction(db, async (tx) => {
         const ref = doc(root, id);
         const snapshot = await tx.get(ref);
@@ -82,6 +95,7 @@ export function inventoryRepository(db: Firestore, uid: string) {
       });
     },
     async archive(id: string, archived: boolean) {
+      requireConnection();
       await runTransaction(db, async (tx) => {
         const ref = doc(root, id);
         if (!(await tx.get(ref)).exists())
@@ -90,6 +104,7 @@ export function inventoryRepository(db: Firestore, uid: string) {
       });
     },
     async change(id: string, input: WeightChange, note: string) {
+      requireConnection();
       if (note.length > 200)
         throw new Error("La nota admite hasta 200 caracteres.");
       const ref = doc(root, id);

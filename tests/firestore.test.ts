@@ -77,6 +77,26 @@ describe("reglas de inventario", () => {
       }),
     );
   });
+  it("crea una bobina mediante transacción y espera la confirmación del servidor", async () => {
+    const db = env
+      .authenticatedContext("alice")
+      .firestore() as unknown as Firestore;
+    const ref = await inventoryRepository(db, "alice").create(
+      spoolSchema.parse(
+        Object.fromEntries(
+          Object.entries(input).filter(([key]) => key !== "lastMovementId"),
+        ),
+      ),
+    );
+    const saved = await getDoc(ref);
+    expect(saved.exists()).toBe(true);
+    expect(saved.data()).toMatchObject({
+      name: "Azul",
+      remainingWeight: 350,
+      lastMovementId: null,
+    });
+    expect(saved.data()?.createdAt).toBeInstanceOf(Timestamp);
+  });
   it("bloquea lecturas y escrituras entre cuentas", async () => {
     const db = env.authenticatedContext("bob").firestore();
     await assertFails(getDoc(doc(db, path)));

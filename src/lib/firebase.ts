@@ -1,6 +1,9 @@
 import { initializeApp } from "firebase/app";
 import {
+  browserLocalPersistence,
   browserSessionPersistence,
+  inMemoryPersistence,
+  indexedDBLocalPersistence,
   connectAuthEmulator,
   initializeAuth,
 } from "firebase/auth";
@@ -30,7 +33,12 @@ const config = {
 
 const app = initializeApp(config);
 export const auth = initializeAuth(app, {
-  persistence: browserSessionPersistence,
+  persistence: [
+    indexedDBLocalPersistence,
+    browserLocalPersistence,
+    browserSessionPersistence,
+    inMemoryPersistence,
+  ],
 });
 export const db = getFirestore(app);
 auth.languageCode = "es";

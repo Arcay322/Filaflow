@@ -1625,3 +1625,99 @@ label .field-help {
     scroll-behavior: auto !important;
   }
 }
+
+/* Installation controls remain outside inventory/forms; no forced install prompt. */
+.pwa-controls {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  max-width: min(360px, calc(100vw - 32px));
+}
+.pwa-install {
+  background: white;
+  box-shadow: 0 3px 16px #17263e12;
+}
+.pwa-update {
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px #17263e14;
+}
+.pwa-update p {
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 8px 0 12px;
+}
+.pwa-update-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.pwa-help ul {
+  padding-left: 20px;
+  line-height: 1.6;
+}
+.pwa-help li + li {
+  margin-top: 12px;
+}
+body:has(.pwa-install) .workspace-footer {
+  padding-bottom: 72px;
+}
+body:has(.pwa-install) .auth-footer {
+  padding-bottom: 72px;
+}
+body:has(.pwa-install) .toast {
+  bottom: 88px;
+}
+body:has(.offline-screen[open]) {
+  overflow: hidden;
+}
+.offline-screen {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  border: 0;
+  margin: 0;
+  padding: max(24px, env(safe-area-inset-top))
+    max(20px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom))
+    max(20px, env(safe-area-inset-left));
+  background: #f5f7fa;
+  color: var(--navy);
+}
+.offline-screen[open] {
+  display: grid;
+  place-items: center;
+}
+.offline-content {
+  max-width: 440px;
+  text-align: center;
+}
+.offline-content .brand {
+  margin: 0 auto 40px;
+}
+.offline-icon {
+  color: var(--blue);
+}
+.offline-content h1 {
+  font-family: "Sora", sans-serif;
+  font-size: clamp(23px, 5vw, 30px);
+  line-height: 1.3;
+  margin: 20px 0 12px;
+}
+.offline-content p {
+  line-height: 1.7;
+}
+.offline-hint {
+  color: var(--muted);
+  margin-top: 24px;
+}
