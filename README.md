@@ -44,6 +44,8 @@ npm run build
 
 Las pruebas cubren cálculos, pesos inválidos, exportación segura, borrado y reescritura de campos numéricos, validación de campos vacíos, aislamiento entre cuentas, movimientos atómicos, sobreconsumo, edición con saldo actualizado y consumos simultáneos. `test:rules` inicia y apaga su propio emulador de Firestore; detén cualquier emulador que ocupe el puerto 8080 antes de ejecutarlo.
 
+La interfaz se verificó en navegador a 320, 390, 600, 768, 900, 1024 y 1440 px, y con 450 px de altura disponible. La navegación compacta se usa hasta 900 px; los formularios pasan a una columna hasta 600 px y conservan visibles sus acciones. Se revisaron textos largos, campos numéricos, consumo, historial, archivo y navegación con teclado.
+
 ## Publicar
 
 Proyecto: `filaflow-a856b`. Hosting sirve los archivos estáticos de `dist`, Authentication usa correo y contraseña, y Firestore Standard usa la base `(default)` en `southamerica-west1` (Santiago).

@@ -320,6 +320,7 @@ export function App() {
                 </select>
                 <button
                   className="button secondary export-button"
+                  aria-label="Exportar inventario a CSV"
                   disabled={spools.length === 0}
                   onClick={exportCsv}
                 >

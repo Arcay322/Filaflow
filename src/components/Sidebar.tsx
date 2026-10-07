@@ -26,15 +26,16 @@ export function Sidebar({
           onClick={() => navigate("inventory")}
         >
           <Boxes size={19} />
-          Inventario<span>{counts.inventory}</span>
+          <span className="nav-label">Inventario</span>
+          <span className="nav-count">{counts.inventory}</span>
         </button>
         <button
           aria-current={view === "low" ? "page" : undefined}
           onClick={() => navigate("low")}
         >
           <TriangleAlert size={19} />
-          Por reponer
-          <span className={counts.low ? "warning-count" : ""}>
+          <span className="nav-label">Por reponer</span>
+          <span className={`nav-count${counts.low ? " warning-count" : ""}`}>
             {counts.low}
           </span>
         </button>
@@ -43,7 +44,8 @@ export function Sidebar({
           onClick={() => navigate("archived")}
         >
           <Archive size={19} />
-          Archivadas<span>{counts.archived}</span>
+          <span className="nav-label">Archivadas</span>
+          <span className="nav-count">{counts.archived}</span>
         </button>
       </nav>
       <div className="sidebar-note">

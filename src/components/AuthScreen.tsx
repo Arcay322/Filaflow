@@ -109,11 +109,9 @@ export function AuthScreen() {
         <div className="auth-intro">
           <span className="eyebrow">Tu mesa de impresión, en orden</span>
           <h1>
-            Cada color.
-            <br />
-            Cada bobina.
-            <br />
-            <span>Cada gramo.</span>
+            <span className="auth-title-line">Cada color.</span>{" "}
+            <span className="auth-title-line">Cada bobina.</span>{" "}
+            <span className="auth-title-line accent">Cada gramo.</span>
           </h1>
           <p>
             Ten a mano lo que tienes y lo que queda. Un inventario simple para
@@ -151,7 +149,6 @@ export function AuthScreen() {
             <label>
               Correo electrónico
               <input
-                autoFocus
                 type="email"
                 required
                 autoComplete="email"

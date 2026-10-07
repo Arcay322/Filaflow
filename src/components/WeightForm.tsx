@@ -147,7 +147,7 @@ export function WeightForm({
           </div>
         )}
         <label>
-          Nota <span className="optional">opcional</span>
+          <span>Nota <span className="optional">opcional</span></span>
           <input
             maxLength={200}
             placeholder={

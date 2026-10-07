@@ -251,7 +251,7 @@ export function SpoolForm({
           </label>
         </div>
         <label>
-          Notas <span className="optional">opcional</span>
+          <span>Notas <span className="optional">opcional</span></span>
           <textarea
             maxLength={500}
             rows={2}
