@@ -33,6 +33,16 @@ const defaults: SpoolInput = {
   notes: "",
   archived: false,
 };
+const numericFields = [
+  "initialWeight",
+  "remainingWeight",
+  "tareWeight",
+  "purchasePrice",
+  "lowStockThreshold",
+] as const;
+type SpoolFormValues = {
+  [K in keyof SpoolInput]: SpoolInput[K] extends number ? string : SpoolInput[K];
+};
 
 export function SpoolForm({
   spool,
@@ -43,21 +53,30 @@ export function SpoolForm({
   onSave: (input: SpoolInput) => Promise<void>;
   onClose: () => void;
 }) {
-  const [values, setValues] = useState<SpoolInput>(
-    spool
-      ? (Object.fromEntries(
-          Object.keys(defaults).map((k) => [k, spool[k as keyof SpoolInput]]),
-        ) as SpoolInput)
-      : defaults,
-  );
+  const [values, setValues] = useState<SpoolFormValues>(() => {
+    const source = spool ?? defaults;
+    return Object.fromEntries(
+      Object.keys(defaults).map((key) => {
+        const value = source[key as keyof SpoolInput];
+        return [key, typeof value === "number" ? String(value) : value];
+      }),
+    ) as SpoolFormValues;
+  });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const field = <K extends keyof SpoolInput>(key: K, value: SpoolInput[K]) =>
+  const field = <K extends keyof SpoolFormValues>(key: K, value: SpoolFormValues[K]) =>
     setValues((v) => ({ ...v, [key]: value }));
   async function submit(event: FormEvent) {
     event.preventDefault();
     setError("");
-    const parsed = spoolSchema.safeParse(values);
+    if (numericFields.some((key) => values[key].trim() === "")) {
+      setError("Completa los campos numéricos; puedes escribir 0 cuando corresponda.");
+      return;
+    }
+    const parsed = spoolSchema.safeParse({
+      ...values,
+      ...Object.fromEntries(numericFields.map((key) => [key, Number(values[key])])),
+    });
     if (!parsed.success) {
       setError(parsed.error.issues[0].message);
       return;
@@ -155,7 +174,7 @@ export function SpoolForm({
               max="10000"
               step="0.001"
               value={values.initialWeight}
-              onChange={(e) => field("initialWeight", Number(e.target.value))}
+              onChange={(e) => field("initialWeight", e.target.value)}
             />
           </label>
           <label>
@@ -165,10 +184,10 @@ export function SpoolForm({
               disabled={!!spool}
               type="number"
               min="0"
-              max={values.initialWeight}
+              max={values.initialWeight || undefined}
               step="0.001"
               value={values.remainingWeight}
-              onChange={(e) => field("remainingWeight", Number(e.target.value))}
+              onChange={(e) => field("remainingWeight", e.target.value)}
             />
           </label>
         </div>
@@ -187,7 +206,7 @@ export function SpoolForm({
               max="100000"
               step="0.01"
               value={values.purchasePrice}
-              onChange={(e) => field("purchasePrice", Number(e.target.value))}
+              onChange={(e) => field("purchasePrice", e.target.value)}
             />
           </label>
           <label>
@@ -196,11 +215,11 @@ export function SpoolForm({
               required
               type="number"
               min="0"
-              max={values.initialWeight}
+              max={values.initialWeight || undefined}
               step="1"
               value={values.lowStockThreshold}
               onChange={(e) =>
-                field("lowStockThreshold", Number(e.target.value))
+                field("lowStockThreshold", e.target.value)
               }
             />
           </label>
@@ -215,7 +234,7 @@ export function SpoolForm({
               max="10000"
               step="0.001"
               value={values.tareWeight}
-              onChange={(e) => field("tareWeight", Number(e.target.value))}
+              onChange={(e) => field("tareWeight", e.target.value)}
             />
             <span className="field-help">
               Tara para descontar al pesarla completa.

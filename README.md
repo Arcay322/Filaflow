@@ -42,7 +42,7 @@ npm run lint
 npm run build
 ```
 
-Las pruebas cubren cálculos, pesos inválidos, exportación segura, aislamiento entre cuentas, movimientos atómicos, sobreconsumo, edición con saldo actualizado y consumos simultáneos. `test:rules` inicia y apaga su propio emulador de Firestore; detén cualquier emulador que ocupe el puerto 8080 antes de ejecutarlo.
+Las pruebas cubren cálculos, pesos inválidos, exportación segura, borrado y reescritura de campos numéricos, validación de campos vacíos, aislamiento entre cuentas, movimientos atómicos, sobreconsumo, edición con saldo actualizado y consumos simultáneos. `test:rules` inicia y apaga su propio emulador de Firestore; detén cualquier emulador que ocupe el puerto 8080 antes de ejecutarlo.
 
 ## Publicar
 
